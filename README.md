@@ -9,7 +9,7 @@ A GitHub Action that integrates with Amazon Q Developer to provide automated cod
 - 🤖 Responds to PR comments with commands:
   - `/review` - Performs a code review
   - `/improve` - Suggests code improvements
-- ✅ Adds reactions to acknowledge commands
+- ✅ Adds reactions to acknowledge commands.
 - 🔐 Secure AWS authentication integration
 
 ## Setup
