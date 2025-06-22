@@ -1,0 +1,152 @@
+name: Amazon Q Code Review
+
+on:
+  issue_comment:
+    types: [created]
+
+# Environment variables for Amazon Q Authentication
+env:
+  # AWS Region where Amazon Q is configured
+  AWS_REGION: 'us-east-1'
+  # Role ARN with permissions to access Amazon Q
+  # AWS_ROLE_ARN: 'arn:aws:iam::123456789012:role/AmazonQDeveloperAccess'
+  
+jobs:
+  process-comment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request && (contains(github.event.comment.body, '/review') || contains(github.event.comment.body, '/improve')) }}
+    
+    permissions:
+      pull-requests: write
+      contents: read
+      issues: write
+      # Required for OIDC authentication with AWS
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Configure AWS Credentials for Amazon Q
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ env.AWS_ROLE_ARN }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      # Install and configure Amazon Q CLI (when available)
+      # - name: Setup Amazon Q CLI
+      #   run: |
+      #     # This step will be updated once Amazon Q CLI is publicly available
+      #     # aws q configure default-mode developer
+
+      - name: Add initial reaction
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const reaction = '+1';
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: reaction
+            });
+
+      - name: Process review command
+        if: contains(github.event.comment.body, '/review')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Mock response for now - will be replaced with actual Amazon Q integration
+            const response = "🤖 Code Review Analysis (Mock):\n\n" +
+                           "* The code looks generally well-structured\n" +
+                           "* Consider adding more unit tests\n" +
+                           "* Documentation could be improved\n\n" +
+                           "This is a placeholder response. Will be replaced with actual Amazon Q review.";
+
+            /* 
+            // Actual Amazon Q Integration (commented until Amazon Q Developer is GA)
+            const pullRequest = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Get the diff content
+            const diff = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              mediaType: {
+                format: 'diff'
+              }
+            });
+
+            // Call Amazon Q Developer API for code review
+            // const amazonQ = new AmazonQDeveloper();
+            // const review = await amazonQ.reviewCode({
+            //   pullRequestDiff: diff.data,
+            //   repository: `${context.repo.owner}/${context.repo.repo}`,
+            //   pullRequestNumber: context.issue.number,
+            //   commitSha: pullRequest.data.head.sha
+            // });
+            
+            // const response = formatAmazonQReview(review);
+            */
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: response
+            });
+
+      - name: Process improve command
+        if: contains(github.event.comment.body, '/improve')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Mock response for now - will be replaced with actual Amazon Q integration
+            const response = "🤖 Code Improvement Suggestions (Mock):\n\n" +
+                           "* Suggested improvements will appear here\n" +
+                           "* Code examples and fixes will be provided\n\n" +
+                           "This is a placeholder response. Will be replaced with actual Amazon Q suggestions.";
+            
+            /*
+            // Actual Amazon Q Integration (commented until Amazon Q Developer is GA)
+            const pullRequest = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Get the files changed in the PR
+            const files = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Call Amazon Q Developer API for code improvements
+            // const amazonQ = new AmazonQDeveloper();
+            // const improvements = await amazonQ.suggestImprovements({
+            //   files: files.data.map(file => ({
+            //     path: file.filename,
+            //     content: file.patch
+            //   })),
+            //   repository: `${context.repo.owner}/${context.repo.repo}`,
+            //   pullRequestNumber: context.issue.number,
+            //   commitSha: pullRequest.data.head.sha
+            // });
+            
+            // const response = formatAmazonQImprovements(improvements);
+            */
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: response
+            });

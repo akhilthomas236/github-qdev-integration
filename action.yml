@@ -1,0 +1,17 @@
+name: 'Amazon Q Review Action'
+description: 'A GitHub Action for code review and improvements using Amazon Q Developer'
+author: 'Your Name'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'code'
+  color: 'blue'
